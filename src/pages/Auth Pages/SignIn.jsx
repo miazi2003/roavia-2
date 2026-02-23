@@ -16,6 +16,7 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
+    console.log("SignIn: Starting Google login");
     try {
       const res = await googleLogin();
       console.log("Google Login Success:", res.user);
@@ -26,6 +27,7 @@ const SignIn = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log("SignIn: Starting email login for:", data.email);
     try {
       const res = await signInUser(data.email, data.password);
       console.log("Email Login Success:", res.user);

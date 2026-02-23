@@ -52,23 +52,29 @@ const AuthProvider = ({ children }) => {
 
   // 🔁 Auth state listener
   useEffect(() => {
+    console.log("AuthProvider: Setting up onAuthStateChanged");
     const unSubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      console.log("AuthProvider: onAuthStateChanged triggered, currentUser:", currentUser?.email);
       setLoading(true);
 
       if (currentUser?.email) {
         try {
+          console.log("AuthProvider: Posting to /jwt for email:", currentUser.email);
           // ✅ Step 1: Get JWT token from backend
           const jwtRes = await axiosSecure.post("/jwt", {
             email: currentUser.email,
           });
           const token = jwtRes.data.token;
+          console.log("AuthProvider: JWT token received");
 
           // ✅ Step 2: Save token to localStorage
           localStorage.setItem("roavia-access-token", token);
 
+          console.log("AuthProvider: Fetching user from /users");
           // ✅ Step 3: Fetch user data from DB
           const userRes = await axiosSecure.get(`/users/${currentUser.email}`);
           const userFromDB = userRes.data;
+          console.log("AuthProvider: User from DB:", userFromDB);
 
           // ✅ Step 4: Set user in state
           setUser({
@@ -78,8 +84,10 @@ const AuthProvider = ({ children }) => {
             photoURL: currentUser.photoURL,
             role: userFromDB?.role || "tourist",
           });
+          console.log("AuthProvider: User set in state");
         } catch (error) {
           console.error("🔥 Auth error:", error.message);
+          console.log("AuthProvider: Using fallback user");
 
           // fallback setUser without DB role
           setUser({
@@ -91,10 +99,12 @@ const AuthProvider = ({ children }) => {
           });
         }
       } else {
+        console.log("AuthProvider: No currentUser, setting user to null");
         setUser(null);
         localStorage.removeItem("roavia-access-token"); // if user logs out or is null
       }
 
+      console.log("AuthProvider: Setting loading to false");
       setLoading(false);
     });
 

@@ -12,7 +12,7 @@ const PackageDetails = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
-  const { id } = useParams(); // ✅ fixed from `_id` to `id`
+  const { id } = useParams();
 
   const [startDate, setStartDate] = useState(new Date());
   const [selectedGuide, setSelectedGuide] = useState("");

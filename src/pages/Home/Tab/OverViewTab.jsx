@@ -28,14 +28,16 @@ const OverViewTab = () => {
     queryKey: ['overviewRandomTours'], 
     queryFn: async () => {
       const res = await axiosSecure.get('/random-tours');
-      return res.data;
+      const data = res.data;
+      console.log("Random tours:", data.length, data);
+      return data;
     },
   });
 
   // 1. Premium Skeleton Loading State (Matches the Tour Guides)
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 w-full">
         {[...Array(6)].map((_, idx) => (
           <div 
             key={idx} 
@@ -92,7 +94,7 @@ const OverViewTab = () => {
       initial="hidden"
       animate="visible"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6">
         {randomData.map((tour, idx) => (
           // Using tour._id as the key is safer than the array index (idx)
           <motion.div key={tour._id || idx} variants={itemVariants} className="h-full">

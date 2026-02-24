@@ -5,14 +5,14 @@ import { FiMail, FiSend } from 'react-icons/fi';
 const Newsletter = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your newsletter subscription logic here
+
     alert("Thanks for subscribing to ROAVIA!");
   };
 
   return (
     <section className="bg-[#3B4E42] py-16 px-4 md:px-8 w-full relative overflow-hidden">
       
-      {/* Decorative Background Glows */}
+
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/5 blur-[100px] rounded-full pointer-events-none"></div>
 
       <motion.div 
@@ -22,18 +22,18 @@ const Newsletter = () => {
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        {/* The Glassmorphism Banner */}
+  
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 md:p-14 lg:p-20 text-center shadow-2xl relative overflow-hidden">
           
-          {/* Faint watermark icon in the background */}
+      
           <FiMail className="absolute -bottom-10 -right-10 text-[15rem] text-white/5 -rotate-12 pointer-events-none" />
 
-          {/* Kicker */}
+
           <span className="text-white/60 tracking-[0.2em] text-sm font-bold uppercase block mb-4">
             Join The Explorer's Club
           </span>
 
-          {/* Headline */}
+   
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6">
             Get exclusive <span className="font-light italic text-white/80">travel offers</span> <br className="hidden md:block" /> directly to your inbox.
           </h2>
@@ -42,7 +42,7 @@ const Newsletter = () => {
             Subscribe to the ROAVIA newsletter and be the first to know about new curated packages, secret destinations, and receive a 10% discount on your first booking.
           </p>
 
-          {/* Newsletter Form (Combined Pill Design) */}
+   
           <form 
             onSubmit={handleSubmit} 
             className="max-w-xl mx-auto flex flex-col sm:flex-row gap-3 sm:gap-0 sm:bg-white/10 sm:border sm:border-white/20 sm:p-1.5 sm:rounded-full sm:focus-within:border-white/50 sm:focus-within:bg-white/15 transition-all duration-300 shadow-lg"
@@ -66,7 +66,7 @@ const Newsletter = () => {
             </button>
           </form>
 
-          {/* Spam Disclaimer */}
+
           <p className="text-white/40 text-xs mt-6 font-light tracking-wide">
             We respect your privacy. No spam, ever. Unsubscribe at any time.
           </p>

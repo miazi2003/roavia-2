@@ -48,7 +48,7 @@ const Testimonials = () => {
     <section className="bg-[#3B4E42] py-16 px-4 md:px-16 overflow-hidden">
       <div className=" mx-auto">
         
-        {/* Section Header */}
+
         <div className="text-center mb-16">
           <span className="text-green-300 tracking-[0.2em] text-sm font-bold uppercase block mb-3">
             Testimonials
@@ -61,13 +61,13 @@ const Testimonials = () => {
           </p>
         </div>
 
-        {/* Testimonials Grid */}
+
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }} // Animates only when scrolled into view
+          viewport={{ once: true, amount: 0.2 }} 
         >
           {testimonials.map((testimonial) => (
             <motion.div 
@@ -75,19 +75,19 @@ const Testimonials = () => {
               variants={cardVariants}
               className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 transform hover:-translate-y-2 group"
             >
-              {/* Star Rating */}
+      
               <div className="flex gap-1 mb-6 text-yellow-400">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <FiStar key={i} className="fill-current" />
                 ))}
               </div>
 
-              {/* Review Text */}
+     
               <p className="text-white/80 font-light leading-relaxed mb-8 italic">
                 "{testimonial.review}"
               </p>
 
-              {/* User Profile */}
+    
               <div className="flex items-center gap-4 mt-auto border-t border-white/10 pt-6">
                 <img 
                   src={testimonial.image} 

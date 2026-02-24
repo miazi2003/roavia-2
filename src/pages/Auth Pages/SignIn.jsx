@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { useLocation, useNavigate } from "react-router";
@@ -11,29 +11,47 @@ const SignIn = () => {
     formState: { errors },
   } = useForm();
 
-  const { googleLogin, signInUser } = useAuth();
+  const { googleLogin, signInUser, user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [authError, setAuthError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Redirect after successful authentication
+  useEffect(() => {
+    if (!loading && user?.role) {
+      const from = location.state?.from?.pathname || "/";
+      navigate(from);
+    }
+  }, [user, loading, location, navigate]);
 
   const handleGoogleLogin = async () => {
     console.log("SignIn: Starting Google login");
+    setAuthError("");
+    setIsSubmitting(true);
     try {
-      const res = await googleLogin();
-      console.log("Google Login Success:", res.user);
-      navigate(location.state?.pathname || "/");
+      await googleLogin();
+      // Navigation will happen in useEffect when user state is set
     } catch (err) {
       console.error("Google Login Error:", err);
+      setAuthError(err.message || "Google login failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const onSubmit = async (data) => {
     console.log("SignIn: Starting email login for:", data.email);
+    setAuthError("");
+    setIsSubmitting(true);
     try {
-      const res = await signInUser(data.email, data.password);
-      console.log("Email Login Success:", res.user);
-      navigate(location.state?.pathname || "/");
+      await signInUser(data.email, data.password);
+      // Navigation will happen in useEffect when user state is set
     } catch (err) {
-      console.error("Email Login Error:", err.message);
+      console.error("Email Login Error:", err);
+      setAuthError(err.message || "Login failed. Please check your email and password.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -42,6 +60,12 @@ const SignIn = () => {
       <div className="card-body bg-white/10 backdrop-blur-md rounded-xl shadow-md flex flex-col gap-3 w-full max-w-md p-8">
         <h1 className="text-4xl font-bold text-white">Welcome Home</h1>
         <p className="text-gray-200">Login with ProFast</p>
+
+        {authError && (
+          <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg text-sm">
+            {authError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
@@ -83,9 +107,10 @@ const SignIn = () => {
 
           <button
             type="submit"
-            className="btn w-full bg-[#caeb66] border-[#caeb66] hover:bg-[#caeb6640] text-black font-semibold transition duration-300"
+            disabled={isSubmitting || loading}
+            className="btn w-full bg-[#caeb66] border-[#caeb66] hover:bg-[#caeb6640] text-black font-semibold transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {isSubmitting || loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
@@ -99,11 +124,13 @@ const SignIn = () => {
         <div className="divider text-white">OR</div>
 
         <button
-          className="btn w-full bg-white text-black border-[#e5e5e5] hover:bg-gray-100"
+          type="button"
+          disabled={isSubmitting || loading}
+          className="btn w-full bg-white text-black border-[#e5e5e5] hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleGoogleLogin}
         >
           <FcGoogle size={20} />
-          Login with Google
+          {isSubmitting || loading ? "Loading..." : "Login with Google"}
         </button>
       </div>
     </div>

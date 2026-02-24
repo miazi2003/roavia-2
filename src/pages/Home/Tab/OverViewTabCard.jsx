@@ -1,10 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router'; // Fixed import to react-router-dom
+import { Link } from 'react-router';
 import { FiMap, FiDollarSign, FiArrowRight } from 'react-icons/fi';
 
 const OverViewTabCard = ({ data }) => {
   return (
-    // Dark Theme Container with a subtle white border
+
     <div className="group h-full flex flex-col bg-[#3B4E42] border border-white/20 rounded-2xl overflow-hidden hover:border-white/50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300 transform hover:-translate-y-1">
       
       {/* Image Container */}
@@ -14,7 +14,7 @@ const OverViewTabCard = ({ data }) => {
           alt={data.title || "Tour Package"}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        {/* Shadow overlay blends seamlessly into the dark card on hover */}
+
         <div className="absolute inset-0 bg-gradient-to-t from-[#3B4E42] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         
         {/* Floating Badge for Tour Type */}
@@ -44,13 +44,13 @@ const OverViewTabCard = ({ data }) => {
 
         {/* Action Button */}
         <div className="mt-6 pt-5 border-t border-white/10">
-          {/* Styled the Link directly as the button block */}
+
           <Link 
             to={`/package/${data._id}`} 
             className="w-full flex justify-center items-center gap-2 bg-transparent border-2 border-white text-white font-bold py-2.5 px-4 rounded-full hover:bg-white hover:text-[#3B4E42] transition-all duration-300"
           >
             View Package 
-            {/* Arrow animates slightly to the right on hover */}
+
             <FiArrowRight className="transform group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

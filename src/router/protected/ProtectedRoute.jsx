@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if(!user){
-    return <Navigate to="/signIn"  state={{ pathname: location.pathname }}/>
+    return <Navigate to="/signIn"  state={{ from: location }}/>
 }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {

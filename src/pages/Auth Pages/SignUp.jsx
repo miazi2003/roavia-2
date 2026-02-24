@@ -17,11 +17,14 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [profilePic, setProfilePic] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
     if (!loading && user?.role) {
-      navigate(location.state?.pathname || "/");
+      const from = location.state?.from?.pathname || "/";
+      navigate(from);
     }
   }, [user, loading, location, navigate]);
 
@@ -45,6 +48,8 @@ const SignUp = () => {
   };
 
   const onSubmit = async (data) => {
+    setAuthError("");
+    setIsSubmitting(true);
     try {
       await createUser(data.email, data.password);
       await axiosSecure.post("/users", {
@@ -60,10 +65,15 @@ const SignUp = () => {
       });
     } catch (err) {
       console.error("Signup error:", err.message);
+      setAuthError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    setAuthError("");
+    setIsSubmitting(true);
     try {
       const res = await googleLogin();
       await axiosSecure.post("/users", {
@@ -74,6 +84,9 @@ const SignUp = () => {
       });
     } catch (err) {
       console.error("Google Sign-In Error:", err.message);
+      setAuthError(err.message || "Google registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -82,6 +95,12 @@ const SignUp = () => {
       <div className="card-body bg-white/10 backdrop-blur-md rounded-xl shadow-md flex flex-col gap-3 w-full max-w-md p-8">
         <h1 className="text-4xl font-bold text-white">Join ROAVIA</h1>
         <p className="text-gray-200">Create an account with us</p>
+
+        {authError && (
+          <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg text-sm">
+            {authError}
+          </div>
+        )}
 
         {/* Profile image preview */}
         <div className="h-24 w-24 rounded-full border-4 border-[#caeb66] mx-auto overflow-hidden mb-2 shadow">
@@ -145,9 +164,10 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="btn w-full bg-[#caeb66] border-[#caeb66] hover:bg-[#caeb6640] text-black font-semibold transition duration-300"
+            disabled={isSubmitting || loading || uploading}
+            className="btn w-full bg-[#caeb66] border-[#caeb66] hover:bg-[#caeb6640] text-black font-semibold transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Register
+            {isSubmitting || loading ? "Registering..." : "Register"}
           </button>
         </form>
 
@@ -161,11 +181,13 @@ const SignUp = () => {
         <div className="divider text-white">OR</div>
 
         <button
+          type="button"
+          disabled={isSubmitting || loading}
           onClick={handleGoogleSignIn}
-          className="btn w-full bg-white text-black border-[#e5e5e5] hover:bg-gray-100"
+          className="btn w-full bg-white text-black border-[#e5e5e5] hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FcGoogle size={20} />
-          Register with Google
+          {isSubmitting || loading ? "Loading..." : "Register with Google"}
         </button>
       </div>
     </div>

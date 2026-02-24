@@ -21,22 +21,22 @@ const AllTab = () => {
       </div>
 
       <Tabs>
-        {/* Custom Pill-Shaped TabList */}
-        <TabList className="flex flex-wrap justify-center items-center bg-gray-100 p-1.5 rounded-full max-w-fit mx-auto mb-12 gap-2 border border-gray-200 shadow-inner !border-b-0">
+
+        <TabList className="flex justify-center items-center bg-gray-100 p-1.5 rounded-full max-w-fit mx-auto mb-12 gap-2 border border-gray-200 shadow-inner !border-b-0">
           
           <Tab 
-            className="flex items-center gap-2 px-6 py-3 rounded-full font-bold cursor-pointer transition-all duration-300 outline-none text-gray-500 hover:text-[#3B4E42] hover:bg-white/50"
+            className="flex items-center gap-2 px-2 py-3 rounded-full font-bold cursor-pointer transition-all duration-300 outline-none text-gray-500 hover:text-[#3B4E42] hover:bg-white/50"
             selectedClassName="!bg-[#3B4E42] !text-white shadow-[0_4px_15px_rgba(59,78,66,0.4)] transform scale-105"
           >
-            <FiMap size={18} />
+            <FiMap size={14} />
             <span>Tour Packages</span>
           </Tab>
 
           <Tab 
-            className="flex items-center gap-2 px-6 py-3 rounded-full font-bold cursor-pointer transition-all duration-300 outline-none text-gray-500 hover:text-[#3B4E42] hover:bg-white/50"
+            className="flex items-center gap-2 px-2 py-3 rounded-full font-bold cursor-pointer transition-all duration-300 outline-none text-gray-500 hover:text-[#3B4E42] hover:bg-white/50"
             selectedClassName="!bg-[#3B4E42] !text-white shadow-[0_4px_15px_rgba(59,78,66,0.4)] transform scale-105"
           >
-            <FiUsers size={18} />
+            <FiUsers size={14} />
             <span>Tour Guides</span>
           </Tab>
 
@@ -52,7 +52,7 @@ const AllTab = () => {
         </TabPanel>
       </Tabs>
 
-      {/* Tailwind Custom Animation (Add this to your globals.css if you want the fade effect) */}
+
       <style>{`
         .animate-fadeIn {
           animation: fadeIn 0.5s ease-in-out;

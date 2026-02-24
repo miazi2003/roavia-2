@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { use } from 'react';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import TourGuideTabCard from './TourGuideTabCard';
 import { motion } from 'framer-motion';
 import { FiAlertCircle, FiUsers } from 'react-icons/fi';
+import useAxiosSecure from '../../../hook/useAxiosSecure';
 
-// Framer Motion variants for a smooth, staggered fade-in effect
+const axiosSecure = useAxiosSecure();
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -23,7 +24,7 @@ const TourGuideTab = () => {
   const { data: randomData = [], isLoading, isError } = useQuery({
     queryKey: ['randomTours'],
     queryFn: async () => {
-      const res = await axios.get('https://a12-server-chi.vercel.app/random-guides');
+      const res = await axiosSecure.get('/random-guides');
       console.log('TourGuideTab: Fetched data:', res.data);
       return res.data;
     },
@@ -84,7 +85,7 @@ const TourGuideTab = () => {
       initial="hidden"
       animate="visible"
     >
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8'>
         {randomData.map((guide, idx) => (
           // Wrapped each card in a motion.div for the stagger effect
           // Using guide._id if available is safer for React keys than the array index!

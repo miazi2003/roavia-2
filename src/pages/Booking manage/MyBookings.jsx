@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../hook/useAxiosSecure";
 import useAuth from "../../hook/useAuth";
 import { Link } from "react-router";
+import { FiCalendar, FiMapPin, FiUser, FiCreditCard, FiXCircle, FiCheckCircle, FiClock } from "react-icons/fi";
+import { format } from "date-fns";
 
 const MyBookings = () => {
   const queryClient = useQueryClient();
@@ -37,29 +39,23 @@ const MyBookings = () => {
   });
 
   const handleCancel = (bookingId) => {
-    cancelMutation.mutate(bookingId);
+    if(window.confirm("Are you sure you want to cancel this booking?")) {
+        cancelMutation.mutate(bookingId);
+    }
   };
 
   if (isLoading)
     return (
-      <div className="text-white text-center min-h-screen bg-[#4d6b57] flex justify-center items-center">
-        Loading...
+      <div className="text-white text-center min-h-screen bg-[#3B4E42] flex justify-center items-center">
+        <div className="w-16 h-16 border-4 border-white/20 border-t-green-300 animate-spin"></div>
       </div>
     );
   if (isError)
     return (
-      <div className="text-white text-center min-h-screen bg-[#4d6b57] flex justify-center items-center">
-        Error Loading Bookings
+      <div className="text-red-400 text-center min-h-screen bg-[#3B4E42] flex justify-center items-center font-mono border border-red-400/30 m-8 bg-red-400/10">
+        ERROR LOADING BOOKING DATA
       </div>
     );
-
-  if (bookings.length === 0) {
-    return (
-      <div className="text-white text-center min-h-screen bg-[#4d6b57] flex justify-center items-center">
-        No Bookings Found...
-      </div>
-    );
-  }
 
   // Pagination logic
   const totalPages = Math.ceil(bookings.length / itemsPerPage);
@@ -68,98 +64,143 @@ const MyBookings = () => {
   const currentBookings = bookings.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="min-h-screen bg-[#4d6b57] p-8 text-white">
-      <h1 className="text-4xl font-bold text-center text-lime-400 mb-10 drop-shadow-lg">
-        ✨ My Bookings ✨
-      </h1>
+    <div className="min-h-screen bg-[#3B4E42] p-8 md:p-12 text-white">
+      
+      {/* --- Header Section --- */}
+      <div className="flex flex-col md:flex-row justify-between items-end mb-10 border-b border-white/20 pb-6 gap-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-white uppercase tracking-tight flex items-center gap-3">
+            <FiCalendar className="text-green-300"/> My Bookings
+          </h1>
+          <p className="text-white/60 text-sm font-mono mt-2">
+            / USER / DASHBOARD / TRIPS
+          </p>
+        </div>
+        
+        {/* Quick Stat (Squared) */}
+        <div className="border border-white/20 px-6 py-3 bg-[#2c3a31]">
+           <span className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-1">Total Trips</span>
+           <span className="text-2xl font-bold text-green-300 font-mono">{bookings.length}</span>
+        </div>
+      </div>
 
-      <div className="overflow-x-auto bg-[#3e5a49] rounded-2xl shadow-2xl border border-green-400">
-        <table className="min-w-full text-center">
-          <thead className="bg-[#2f4c3b] text-lime-300 text-sm uppercase tracking-wide">
-            <tr>
-              {["Package", "Tour Guide", "Date", "Price", "Status", "Actions"].map(
-                (header, i) => (
-                  <th
-                    key={i}
-                    className="p-4 border-b border-green-400 font-semibold"
+      {bookings.length === 0 ? (
+        <div className="border border-dashed border-white/20 p-20 text-center text-white/40 font-mono uppercase">
+          NO BOOKINGS FOUND. START YOUR ADVENTURE!
+        </div>
+      ) : (
+        <div className="w-full border border-white/20 bg-[#2c3a31] shadow-2xl">
+           <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#1f2d25] border-b border-white/20 text-xs uppercase tracking-widest text-white/50">
+                  <th className="p-5 font-bold border-r border-white/10">Package Details</th>
+                  <th className="p-5 font-bold border-r border-white/10">Guide</th>
+                  <th className="p-5 font-bold border-r border-white/10">Schedule</th>
+                  <th className="p-5 font-bold border-r border-white/10">Total Cost</th>
+                  <th className="p-5 font-bold border-r border-white/10 text-center">Status</th>
+                  <th className="p-5 font-bold text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {currentBookings.map((booking) => (
+                  <tr 
+                    key={booking._id} 
+                    className="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group"
                   >
-                    {header}
-                  </th>
-                )
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {currentBookings.map((booking) => (
-              <motion.tr
-                key={booking._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="bg-[#2f4c3b] border-b border-green-400"
-              >
-                <td className="p-4 text-white">{booking.packageName}</td>
-                <td className="p-4 text-white">{booking.guideName}</td>
-                <td className="p-4 text-white">{booking.tourDate}</td>
-                <td className="p-4 text-lime-300 font-medium">
-                  ${booking.price}
-                </td>
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      booking.status === "Pending"
-                        ? "bg-yellow-500 text-black"
-                        : booking.status === "Accepted"
-                        ? "bg-green-500 text-white"
-                        : booking.status === "Rejected"
-                        ? "bg-red-500"
-                        : "bg-gray-400 text-black"
-                    }`}
-                  >
-                    {booking.status}
-                  </span>
-                </td>
-                <td className="p-4 flex gap-2 justify-center">
-                  {booking.status === "pending" && (
-                    <>
-                      <Link to={`/dashBoard/payment/${booking._id}`}>
-                        <button className="bg-lime-500 hover:bg-lime-400 text-black font-semibold px-4 py-2 rounded-lg shadow-md shadow-lime-300/40 transition-all">
-                          Pay
-                        </button>
-                      </Link>
-                      <button
-                        onClick={() => {
-                          handleCancel(booking._id);
-                        }}
-                        className="bg-red-500 hover:bg-red-400 text-white font-semibold px-4 py-2 rounded-lg shadow-md shadow-red-300/40 transition-all"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                </td>
-              </motion.tr>
+                    <td className="p-5 border-r border-white/10">
+                      <div className="font-bold text-white uppercase tracking-wide text-lg">{booking.packageName}</div>
+                    </td>
+
+                    <td className="p-5 border-r border-white/10">
+                       <div className="flex items-center gap-2 text-white/80">
+                         <FiUser className="text-green-300" />
+                         <span className="font-mono">{booking.guideName}</span>
+                       </div>
+                    </td>
+
+                    <td className="p-5 border-r border-white/10">
+                       <div className="flex items-center gap-2 text-white/80">
+                         <FiClock className="text-white/40" />
+                         <span className="font-mono">{booking.tourDate ? format(new Date(booking.tourDate), "MMM dd, yyyy") : "N/A"}</span>
+                       </div>
+                    </td>
+
+                    <td className="p-5 border-r border-white/10">
+                       <span className="font-mono text-xl font-bold text-green-300">${booking.price}</span>
+                    </td>
+
+                    <td className="p-5 border-r border-white/10 text-center">
+                       <div className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-bold uppercase tracking-widest border ${
+                          booking.status === 'pending' 
+                            ? 'border-yellow-400 text-yellow-400 bg-yellow-400/10' 
+                            : booking.status === 'accepted' || booking.status === 'confirmed'
+                              ? 'border-green-300 text-green-300 bg-green-300/10'
+                              : booking.status === 'rejected' || booking.status === 'cancelled'
+                                ? 'border-red-400 text-red-400 bg-red-400/10'
+                                : 'border-white/20 text-white/60'
+                       }`}>
+                          {booking.status === 'pending' && <FiClock size={12}/>}
+                          {booking.status === 'accepted' && <FiCheckCircle size={12}/>}
+                          {booking.status === 'cancelled' && <FiXCircle size={12}/>}
+                          {booking.status}
+                       </div>
+                    </td>
+
+                    <td className="p-5 text-center">
+                       <div className="flex items-center justify-center gap-3">
+                         {booking.status === "pending" && (
+                            <>
+                              <Link to={`/dashBoard/payment/${booking._id}`}>
+                                <button 
+                                  className="w-10 h-10 flex items-center justify-center border border-green-300 text-green-300 hover:bg-green-300 hover:text-[#2c3a31] transition-all duration-300"
+                                  title="Proceed to Payment"
+                                >
+                                  <FiCreditCard size={18} />
+                                </button>
+                              </Link>
+                              
+                              <button
+                                onClick={() => handleCancel(booking._id)}
+                                className="w-10 h-10 flex items-center justify-center border border-red-400 text-red-400 hover:bg-red-400 hover:text-[#2c3a31] transition-all duration-300"
+                                title="Cancel Booking"
+                              >
+                                <FiXCircle size={18} />
+                              </button>
+                            </>
+                         )}
+                         {booking.status !== "pending" && (
+                           <span className="text-xs font-bold text-white/20 uppercase tracking-widest cursor-not-allowed">
+                             No Actions
+                           </span>
+                         )}
+                       </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {/* Pagination Footer (Squared) */}
+          <div className="p-4 bg-[#1f2d25] border-t border-white/20 flex justify-center gap-2">
+            {[...Array(totalPages).keys()].map((num) => (
+                <button
+                key={num}
+                onClick={() => setCurrentPage(num + 1)}
+                className={`w-8 h-8 flex items-center justify-center text-xs font-bold border transition-colors ${
+                    currentPage === num + 1
+                    ? "bg-green-300 border-green-300 text-[#3B4E42]"
+                    : "border-white/10 text-white hover:border-white hover:bg-white/5"
+                }`}
+                >
+                {num + 1}
+                </button>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
 
-      {/* Pagination Controls */}
-      <div className="mt-6 flex justify-center gap-2">
-        {[...Array(totalPages).keys()].map((num) => (
-          <button
-            key={num}
-            onClick={() => setCurrentPage(num + 1)}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              currentPage === num + 1
-                ? "bg-lime-400 text-black"
-                : "bg-[#2f4c3b] text-white border border-green-400"
-            } hover:bg-lime-300 hover:text-black transition-all`}
-          >
-            {num + 1}
-          </button>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -107,7 +107,7 @@ const GlobeSection = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center relative z-10">
         
 
-        <div className="w-full max-w-[600px] h-[400px] md:h-[600px] relative">
+        <div className="w-full max-w-[700px] h-[400px] md:h-[700px] relative">
 
             <Canvas camera={{ position: [0, 0, 8.5], fov: 45 }}>
             <ambientLight intensity={0.5} color="#ffffff" />

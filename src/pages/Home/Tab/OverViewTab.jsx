@@ -94,7 +94,7 @@ const OverViewTab = () => {
       initial="hidden"
       animate="visible"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {randomData.map((tour, idx) => (
           // Using tour._id as the key is safer than the array index (idx)
           <motion.div key={tour._id || idx} variants={itemVariants} className="h-full">

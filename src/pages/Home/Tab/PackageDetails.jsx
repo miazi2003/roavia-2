@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Modal from "react-modal";
 import { toast } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
+import { FiMapPin, FiCalendar, FiDollarSign, FiUser, FiCheckCircle } from "react-icons/fi";
 import useAuth from "../../../hook/useAuth";
 import useAxiosSecure from "../../../hook/useAxiosSecure";
 
@@ -18,9 +19,7 @@ const PackageDetails = () => {
   const [selectedGuide, setSelectedGuide] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  
-
-  // ✅ Fetch tour data by ID
+  // Fetch tour data
   const { data: tour = null, isLoading: loadingTour } = useQuery({
     queryKey: ["tourData", id],
     queryFn: async () => {
@@ -29,7 +28,7 @@ const PackageDetails = () => {
     },
   });
 
-  // ✅ Fetch tour guides
+  // Fetch tour guides
   const { data: guides = [], isLoading: loadingGuides } = useQuery({
     queryKey: ["tourGuides"],
     queryFn: async () => {
@@ -38,8 +37,8 @@ const PackageDetails = () => {
     },
   });
 
-  // ✅ Booking handler
-  const handleBooking = async () => {
+  const handleBooking = async (e) => {
+    e.preventDefault();
     if (!user) {
       toast.error("Please log in to book a package.");
       navigate("/login");
@@ -52,7 +51,7 @@ const PackageDetails = () => {
     }
 
     const bookingData = {
-      tourId : tour._id ,
+      tourId: tour._id,
       packageName: tour.title,
       touristName: user.displayName,
       touristEmail: user.email,
@@ -61,201 +60,245 @@ const PackageDetails = () => {
       tourDate: startDate,
       guideName: selectedGuide,
       status: "pending",
-      paymentStatus : "pending"
+      paymentStatus: "pending"
     };
 
-    console.log("bookingPage" , tour._id)
-
     try {
-      const res = await axiosSecure.post("/bookings", bookingData);
+      await axiosSecure.post("/bookings", bookingData);
       setModalIsOpen(true);
-      console.log(res.data)
     } catch (err) {
       toast.error("Booking failed. Please try again.");
-      console.error(err);
     }
   };
 
-  if (loadingTour || loadingGuides) return <p className="min-h-screen">Loading...</p>;
-  if (!tour) return <p className="min-h-screen">Tour not found.</p>;
+  if (loadingTour || loadingGuides) {
+    return (
+      <div className="min-h-screen bg-[#3B4E42] flex justify-center items-center">
+        <div className="w-16 h-16 border-4 border-white/20 border-t-green-300 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!tour) return <div className="min-h-screen bg-[#3B4E42] text-white flex justify-center items-center">Tour not found.</div>;
+
+
+  const galleryImages = (Array.isArray(tour.images) && tour.images.length > 0)
+    ? tour.images
+    : [tour.image || tour.photo || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80"];
 
   return (
-    <div className="space-y-10 px-6 py-8">
-      {/* Gallery */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {tour.images?.map((img, i) => (
-          <img
-            key={i}
-            src={img}
-            alt={`Tour image ${i + 1}`}
-            className="w-full h-48 object-cover rounded-md shadow"
-          />
-        ))}
-      </div>
+    <div className="min-h-screen bg-[#3B4E42] text-white">
 
-      {/* About the Tour */}
-      <div className="text-white bg-[#3b4e42] p-6 rounded-md shadow">
-        <h2 className="text-2xl font-bold mb-2">About the Tour</h2>
-        <p>{tour.description}</p>
-        <br />
-        <img src={tour.photo} alt="" className="lg:h-122 lg:w-screen" />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 h-[50vh] md:h-[60vh] gap-1 p-1">
+        {galleryImages.slice(0, 5).map((img, i) => (
+          <div 
+            key={i} 
+            className={`relative overflow-hidden group bg-black/20 ${
 
-      {/* Tour Plan */}
-      <div className="text-white bg-[#3b4e42] p-6 rounded-md shadow space-y-4">
-        <h2 className="text-2xl font-bold">Tour Plan</h2>
-        {tour.plan?.map((day, i) => (
-          <div key={i}>
-            <h4 className="font-semibold">Day {i + 1}:</h4>
-            <p>{day}</p>
+              i === 0 
+                ? (galleryImages.length === 1 ? "md:col-span-4 md:row-span-2" : "md:col-span-2 md:row-span-2") 
+                : "md:col-span-1 md:row-span-1"
+            }`}
+          >
+            <img
+              src={img}
+              alt={`Tour visual ${i + 1}`}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
           </div>
         ))}
       </div>
 
-            {/* Booking Form */}
-    {/* Booking Form */}
-<div className="bg-[#3b4e42] p-6 rounded-md shadow-md max-w-3xl mx-auto">
-  <h2 className="text-2xl font-bold mb-6 text-lime-300 text-center">
-    Book This Tour
-  </h2>
-  <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Package Title */}
-    <div className="flex flex-col">
-      <label className="mb-1 text-lime-200 font-semibold">Package Name</label>
-      <input
-        type="text"
-        value={tour.title}
-        readOnly
-        className="input input-bordered bg-[#2f4237] border-lime-500 text-lime-100"
-      />
-    </div>
-
-    {/* Tourist Name */}
-    <div className="flex flex-col">
-      <label className="mb-1 text-lime-200 font-semibold">Your Name</label>
-      <input
-        type="text"
-        value={user?.displayName || ""}
-        readOnly
-        className="input input-bordered bg-[#2f4237] border-lime-500 text-lime-100"
-      />
-    </div>
-
-    {/* Tourist Email */}
-    <div className="flex flex-col">
-      <label className="mb-1 text-lime-200 font-semibold">Your Email</label>
-      <input
-        type="email"
-        value={user?.email || ""}
-        readOnly
-        className="input input-bordered bg-[#2f4237] border-lime-500 text-lime-100"
-      />
-    </div>
-
-    {/* Price */}
-    <div className="flex flex-col">
-      <label className="mb-1 text-lime-200 font-semibold">Price (৳)</label>
-      <input
-        type="number"
-        value={tour.price}
-        readOnly
-        className="input input-bordered bg-[#2f4237] border-lime-500 text-lime-100"
-      />
-    </div>
-
-    {/* Date Picker */}
-    <div className="flex flex-col md:col-span-2">
-      <label className="mb-1 text-lime-200 font-semibold">Select Tour Date</label>
-      <DatePicker
-        selected={startDate}
-        onChange={(date) => setStartDate(date)}
-        className="input input-bordered w-full bg-[#2f4237] border-lime-500 text-lime-100"
-        calendarClassName="bg-[#3b4e42] text-lime-200"
-      />
-    </div>
-
-    {/* Tour Guide Select */}
-    <div className="flex flex-col md:col-span-2">
-      <label className="mb-1 text-lime-200 font-semibold">Select a Tour Guide</label>
-      <select
-        value={selectedGuide}
-        onChange={(e) => setSelectedGuide(e.target.value)}
-        className="select select-bordered w-full bg-[#2f4237] border-lime-500 text-lime-100"
-        style={{
-          appearance: "none",
-          WebkitAppearance: "none",
-          MozAppearance: "none",
-        }}
-      >
-        <option disabled value="">
-          Select a tour guide
-        </option>
-        {guides.map((g) => (
-          <option
-            key={g._id}
-            value={g.name}
-            style={{ backgroundColor: "#2f4237", color: "#d9f99d" }}
-          >
-            {g.name}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    {/* Book Now Button */}
-    <div className="md:col-span-2">
-      <button
-        onClick={handleBooking}
-        className="w-full bg-lime-500 hover:bg-lime-400 text-[#3b4e42] font-bold py-3 rounded-md transition-colors duration-300"
-      >
-        Book Now
-      </button>
-    </div>
-  </form>
-</div>
-
-
-      {/* Confirmation Modal */}
-      <Modal
-        isOpen={modalIsOpen}
-        className="bg-white p-6 max-w-sm mx-auto rounded shadow mt-20"
-      >
-        <h2 className="text-xl font-bold text-green-700 mb-4">
-          Confirm your Booking
-        </h2>
-        <p className="mb-4">
-          Your booking request has been sent. You can manage it from My Bookings.
-        </p>
-        <button
-          onClick={() => navigate("/dashBoard/manageBookings")}
-          className="bg-lime-500 px-4 py-2 rounded hover:bg-lime-400"
-        >
-          Go to My Bookings
-        </button>
-      </Modal>
-
-      {/* Tour Guides */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4 text-green-900">Tour Guides</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {guides.map((guide) => (
-            <div
-              key={guide._id}
-              onClick={() => navigate(`/guide/${guide._id}`)}
-              className="cursor-pointer bg-[#4d6b57] text-white p-3 rounded-md hover:bg-[#3b4e42] transition"
-            >
-              <img
-                src={guide.photo}
-                alt={guide.name}
-                className="h-32 w-full object-cover rounded"
-              />
-              <h4 className="mt-2 font-semibold">{guide.name}</h4>
-              <p className="text-sm">Exp: {guide.experience_years} yrs</p>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          
+          {/* --- LEFT COLUMN: CONTENT --- */}
+          <div className="w-full lg:w-2/3 space-y-12">
+            
+            {/* Header */}
+            <div>
+              <div className="flex items-center gap-2 text-green-300 mb-2 uppercase tracking-wider text-xs font-bold">
+                <FiMapPin />
+                <span>{tour.type || "Adventure"}</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+                {tour.title}
+              </h1>
+              <div className="flex flex-wrap gap-6 text-white/70 border-y border-white/10 py-6">
+                <div className="flex items-center gap-2">
+                  <FiDollarSign className="text-green-300" />
+                  <span className="text-xl font-bold text-white">${tour.price}</span>
+                  <span className="text-sm">/ person</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FiCalendar className="text-green-300" />
+                  <span>5 Days / 4 Nights</span>
+                </div>
+              </div>
             </div>
-          ))}
+
+            {/* About */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-white">About the Experience</h2>
+              <p className="text-white/80 leading-relaxed text-lg font-light">
+                {tour.description}
+              </p>
+            </div>
+
+            {/* Tour Plan (Timeline) */}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white">Itinerary</h2>
+              <div className="border-l-2 border-white/10 ml-3 space-y-8">
+                {tour.plan?.map((day, i) => (
+                  <div key={i} className="relative pl-8">
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-green-300 border-4 border-[#3B4E42]"></div>
+                    <h4 className="text-lg font-bold text-green-300 mb-1">Day {i + 1}</h4>
+                    <p className="text-white/80">{day}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Meet the Guides */}
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-6">Meet Our Guides</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {guides.map((guide) => (
+                  <div 
+                    key={guide._id} 
+                    onClick={() => navigate(`/guide/${guide._id}`)}
+                    className="group cursor-pointer bg-[#2c3a31] border border-white/10 rounded-xl overflow-hidden hover:border-green-300 transition-all"
+                  >
+                    <div className="h-40 overflow-hidden">
+                      <img src={guide.photo} alt={guide.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    </div>
+                    <div className="p-4">
+                      <h4 className="font-bold text-white group-hover:text-green-300 transition-colors">{guide.name}</h4>
+                      <p className="text-xs text-white/50">{guide.experience_years} years exp.</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+ {/* --- RIGHT COLUMN: BOOKING FORM (Sticky & Outlined) --- */}
+          <div className="w-full lg:w-1/3">
+            <div className="sticky top-24 bg-transparent border-2 border-white/10 rounded-[2rem] p-8 relative hover:border-white/30 transition-colors duration-500">
+              
+              <div className="flex items-center justify-between mb-8">
+                 <h3 className="text-3xl font-extrabold text-white uppercase tracking-tighter">Book Trip</h3>
+                 <div className="flex items-center gap-2 border border-green-300 rounded-full px-3 py-1">
+                    <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] font-bold text-green-300 tracking-widest uppercase">Instant</span>
+                 </div>
+              </div>
+
+              <form onSubmit={handleBooking} className="space-y-6">
+
+                {/* Date Picker Input Group (Outlined) */}
+                <div className="group space-y-2">
+                  <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1 group-hover:text-green-300 transition-colors">Travel Date</label>
+                  <div className="relative">
+                       <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        className="w-full bg-transparent text-white font-bold text-lg rounded-xl px-4 py-4 border-2 border-white/20 focus:border-green-300 outline-none transition-all duration-300 cursor-pointer placeholder-white/20"
+                        calendarClassName="bg-white text-black font-sans shadow-xl rounded-xl border-0 p-2"
+                        dateFormat="MMM d, yyyy"
+                      />
+                      <FiCalendar className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 group-hover:text-green-300 transition-colors pointer-events-none text-xl" />
+                  </div>
+                </div>
+
+                {/* Guide Select Group (Outlined) */}
+                <div className="group space-y-2">
+                   <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1 group-hover:text-green-300 transition-colors">Your Guide</label>
+                   <div className="relative">
+                      <select
+                        value={selectedGuide}
+                        onChange={(e) => setSelectedGuide(e.target.value)}
+                        className="w-full bg-transparent text-white font-bold text-lg rounded-xl px-4 py-4 border-2 border-white/20 focus:border-green-300 outline-none appearance-none transition-all duration-300 cursor-pointer"
+                      >
+                        <option disabled value="" className="bg-[#3B4E42]">Choose Expert...</option>
+                        {guides.map((g) => (
+                          <option key={g._id} value={g.name} className="bg-[#3B4E42] text-white py-2">{g.name}</option>
+                        ))}
+                      </select>
+                      <FiUser className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 group-hover:text-green-300 transition-colors pointer-events-none text-xl" />
+                   </div>
+                </div>
+
+                {/* Price Breakdown (Outlined Box) */}
+                <div className="border border-dashed border-white/20 rounded-xl p-6 space-y-4 mt-6">
+                  <div className="flex justify-between text-white/60 text-sm font-medium">
+                    <span>Base Price</span>
+                    <span>${tour.price}</span>
+                  </div>
+                  <div className="flex justify-between text-white/60 text-sm font-medium">
+                    <span>Taxes & Fees</span>
+                    <span>$0</span>
+                  </div>
+                  <div className="w-full h-px bg-white/10"></div>
+                  <div className="flex justify-between items-end">
+                    <span className="text-white font-bold uppercase tracking-wider text-sm mb-1">Total</span>
+                    <span className="text-4xl font-extrabold text-white">${tour.price}</span>
+                  </div>
+                </div>
+
+                {/* Action Button (Outlined -> Solid Hover) */}
+                <button
+                  type="submit"
+                  className="w-full bg-transparent border-2 border-green-300 text-green-300 hover:bg-green-300 hover:text-[#3B4E42] font-extrabold text-lg py-4 rounded-xl transform active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 mt-4"
+                >
+                  CONFIRM BOOKING
+                  <FiCheckCircle className="text-xl" />
+                </button>
+
+                <p className="text-center text-white/30 text-xs font-medium tracking-wide">
+                   Free cancellation up to 48 hours before trip.
+                </p>
+
+              </form>
+            </div>
+          </div>
+
         </div>
       </div>
 
+      {/* --- CONFIRMATION MODAL --- */}
+      <Modal
+        isOpen={modalIsOpen}
+        className="outline-none"
+        overlayClassName="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+        onRequestClose={() => setModalIsOpen(false)}
+      >
+        <div className="bg-[#2c3a31] border border-green-300 p-8 rounded-2xl max-w-md w-full text-center shadow-2xl">
+          <div className="w-16 h-16 bg-green-300/20 rounded-full flex items-center justify-center mx-auto mb-6 text-green-300">
+            <FiCheckCircle size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Booking Requested!</h2>
+          <p className="text-white/70 mb-8">
+            Your adventure awaits. We have received your booking request for <strong>{tour.title}</strong>.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setModalIsOpen(false)}
+              className="flex-1 px-4 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5"
+            >
+              Close
+            </button>
+            <button
+              onClick={() => navigate("/dashBoard/manageBookings")}
+              className="flex-1 px-4 py-3 rounded-lg bg-green-300 text-[#3B4E42] font-bold hover:bg-white"
+            >
+              My Bookings
+            </button>
+          </div>
+        </div>
+      </Modal>
 
     </div>
   );

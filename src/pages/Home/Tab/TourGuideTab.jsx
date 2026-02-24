@@ -87,8 +87,7 @@ const TourGuideTab = () => {
     >
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8'>
         {randomData.map((guide, idx) => (
-          // Wrapped each card in a motion.div for the stagger effect
-          // Using guide._id if available is safer for React keys than the array index!
+
           <motion.div key={guide._id || idx} variants={itemVariants}>
             <TourGuideTabCard guide={guide} />
           </motion.div>

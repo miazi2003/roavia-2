@@ -67,12 +67,12 @@ const TourGuideTabCard = ({ guide }) => {
         </div>
 
         {/* Action Button */}
-        <Link to={`/guide/${guide._id}`} className="mt-auto">
+        {/* <Link to={`/guideProfile/${guide._id}`} className="mt-auto">
           <button className="w-full group/btn flex items-center justify-center gap-2 py-3 rounded-xl bg-transparent border border-white/20 text-white font-semibold hover:bg-green-300 hover:border-green-300 hover:text-[#2c3a31] transition-all duration-300">
             View Profile
             <FiArrowRight className="group-hover/btn:translate-x-1 transition-transform" />
           </button>
-        </Link>
+        </Link> */}
       </div>
 
     </div>
